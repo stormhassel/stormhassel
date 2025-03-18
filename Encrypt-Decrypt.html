@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glassy Encryption Tool</title>
+    <!-- Renogare Font (Replace with actual font source) -->
+    <link href="https://fonts.googleapis.com/css2?family=Renogare&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        /* Fallback Renogare Font */
+        @font-face {
+            font-family: 'Renogare';
+            src: url('path/to/renogare.woff2') format('woff2'),
+                 url('path/to/renogare.woff') format('woff');
+            font-weight: normal;
+            font-display: swap;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Renogare', sans-serif;
+        }
+
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://4kwallpapers.com/images/walls/thumbs_3t/21506.png');
+            background-size: cover;
+            background-position: center;
+            filter: blur(15px) brightness(50%);
+            transform: scale(1.1);
+            z-index: 1;
+        }
+
+        .encryption-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            z-index: 2;
+        }
+
+        .title {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 24px;
+            letter-spacing: 1px;
+        }
+
+        .input-group {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            color: white;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .input-group input, 
+        .input-group textarea {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-family: 'Renogare', sans-serif;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .btn {
+            flex: 1;
+            margin: 0 5px;
+            padding: 10px;
+            background: rgba(52, 211, 153, 0.4);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            font-family: 'Renogare', sans-serif;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: rgba(52, 211, 153, 0.6);
+        }
+
+        #result {
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            color: white;
+            word-break: break-all;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 600px) {
+            .encryption-container {
+                width: 90%;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    
+    <div class="encryption-container">
+        <h2 class="title">Encryption Tool</h2>
+        
+        <div class="input-group">
+            <label for="secretKey">Secret Key</label>
+            <input type="password" id="secretKey" placeholder="Enter encryption key">
+        </div>
+
+        <div class="input-group">
+            <label for="inputText">Text</label>
+            <textarea id="inputText" placeholder="Enter text to encrypt/decrypt"></textarea>
+        </div>
+
+        <div class="button-group">
+            <button class="btn" onclick="encryptText()">Encrypt</button>
+            <button class="btn" onclick="decryptText()">Decrypt</button>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function encryptText() {
+            const inputText = document.getElementById('inputText').value;
+            const secretKey = document.getElementById('secretKey').value;
+            const resultDiv = document.getElementById('result');
+
+            if (!inputText) {
+                resultDiv.textContent = 'Please enter text to encrypt.';
+                return;
+            }
+
+            if (!secretKey) {
+                resultDiv.textContent = 'Please enter a secret key.';
+                return;
+            }
+
+            try {
+                const encryptedText = CryptoJS.AES.encrypt(inputText, secretKey).toString();
+                resultDiv.textContent = 'Encrypted Text: ' + encryptedText;
+            } catch (error) {
+                resultDiv.textContent = 'Encryption failed: ' + error.message;
+            }
+        }
+
+        function decryptText() {
+            const inputText = document.getElementById('inputText').value;
+            const secretKey = document.getElementById('secretKey').value;
+            const resultDiv = document.getElementById('result');
+
+            if (!inputText) {
+                resultDiv.textContent = 'Please enter text to decrypt.';
+                return;
+            }
+
+            if (!secretKey) {
+                resultDiv.textContent = 'Please enter the secret key.';
+                return;
+            }
+
+            try {
+                const decryptedBytes = CryptoJS.AES.decrypt(inputText, secretKey);
+                const decryptedText = decryptedBytes.toString(CryptoJS.enc.Utf8);
+
+                if (decryptedText) {
+                    resultDiv.textContent = 'Decrypted Text: ' + decryptedText;
+                } else {
+                    resultDiv.textContent = 'Decryption failed. Check your key and encrypted text.';
+                }
+            } catch (error) {
+                resultDiv.textContent = 'Decryption failed: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
